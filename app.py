@@ -68,9 +68,9 @@ def handle_method_not_allowed(e):
 def handle_too_many_requests(e):
     return render_template('Errors/429.html'), 429
 
- @app.errorhandler(500)
- def handle_internal_server_error(e):
-     return render_template('Errors/500.html'), 500
+@app.errorhandler(500)
+def handle_internal_server_error(e):
+    return render_template('Errors/500.html'), 500
 
 def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cooking_time=None):
     # Initialize the LLM
