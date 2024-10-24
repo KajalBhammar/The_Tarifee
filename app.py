@@ -174,17 +174,29 @@ def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cook
 import openai
 import time
 
-def generate_image(recipe_name):
+def generate_image(prompt):
     try:
+        # Make a request to generate an image with DALL·E
         response = openai.Image.create(
-            prompt=recipe_name,
-            n=1,
-            size="512x512"
+            prompt=prompt,  # Optimized prompt
+            n=1,            # Number of images to generate
+            size="512x512"  # Size of the image
         )
-        return response['data'][0]['url']
-    except OpenAIError as e:
+
+        # Access and return the generated image URL
+        image_url = response['data'][0]['url']
+        return image_url
+
+    except openai.error.InvalidRequestError as e:
+        print(f"Invalid request: {e.user_message}")
+    except openai.error.APIConnectionError:
+        print("Error connecting to the API. Please try again later.")
+    except openai.error.RateLimitError:
+        print("Rate limit exceeded. Please wait before making more requests.")
+    except openai.error.OpenAIError as e:
         print(f"An error occurred: {e}")
-        return None
+
+    return None
 
 
 
