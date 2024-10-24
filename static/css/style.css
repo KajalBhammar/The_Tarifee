@@ -1,0 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800;900&display=swap');
+
+* {
+  padding: 0;
+  margin: 0;
+  /* box-sizing: border-box; */
+}
+
+.sentence-case::first-letter {
+  text-transform: uppercase;
+}
+
+body {
+  /* font-weight: 300;
+  font-size: 1.05rem; */
+  line-height: 1.6;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  /* box-sizing: border-box; */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* meal card end */
+.popup-container {
+  display: none;
+  position: fixed;
+  top: 52%;
+  bottom: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  z-index: 1;
+  max-width: 900px;
+  width: 350%;
+  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */
+  /* border-radius: 8px; */
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.popup-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* background-image: url('popup.png'); */
+  background-size: cover;
+  background-position: center;
+  filter: blur(5px);
+  z-index: -1;
+}
+
+.popup-container h2 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #000000;
+  /* background-color: rgba(255, 255, 255, 0.8); */
+}
+
+.popup-container p {
+  margin-bottom: 10px;
+  color: #000000;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.popup-container button {
+  background-color:  #eb4a36;;
+  color: black;
+  padding: 10px 15px;
+  border: none;
+  /* border-radius: 5px; */
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+
+@media (max-width: 768px) {
+  .popup-container {
+    max-width: 90%;
+    width: 100%;
+  }
+}
+
+@media (max-height: 600px) {
+  .popup-container {
+    max-height: 80vh;
+  }
+}
+
+.popup-design {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: rgb(0, 0, 0);
+  display: inline-block;
+  max-height: 100%; /* Adjust as needed */
+  overflow-y: auto;
+}
+
+
+@media (max-width: 768px) {
+  .popup-container {
+    max-width: 90%;
+    width: 100%;
+  }
+}
+
+@media (max-height: 600px) {
+  .popup-container {
+    max-height: 80vh;
+  }
+}
+
+.popup-design {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: rgb(0, 0, 0);
+  display: inline-block;
+}
+
+.result-ingredients {
+  margin-left: 20px;
+}

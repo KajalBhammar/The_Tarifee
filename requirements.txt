@@ -1,0 +1,6 @@
+Flask
+langchain
+openai
+langchain_community
+flask_limiter
+    

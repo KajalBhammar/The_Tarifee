@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en-gb" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Tarife</title>
+  <link rel="shortcut icon" type="image/png" href="img/favicon.png">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Leckerli+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../static/css/main.css">
+  <link rel="stylesheet" href="../static/css/style.css">
+  <link rel="icon" type="image/x-icon" href="../static/round_logo.png">
+  <script src="../static/js/uikit.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script>
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement(
+        {
+          pageLanguage: 'en',
+          includedLanguages: 'en,gu,hi',
+          layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+          gaTrack: true,
+          gaId: 'YOUR_ANALYTICS_ID'
+        },
+        'google_translate_element'
+      );
+    };
+  </script>
+  <style>
+    .recipe-card {
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 400px;
+      background-color: #fff;
+      /* Set background color to white */
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .recipe-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .recipe-card h4 {
+      margin-top: 0;
+      color: #8b4513;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .recipe-card h3 {
+      color: #555;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+
+    .recipe-card ul,
+    .recipe-card ol {
+      margin: 0;
+      padding: 0;
+      list-style-type: none;
+    }
+
+    .recipe-card ul li,
+    .recipe-card ol li {
+      margin-bottom: 10px;
+      font-size: 16px;
+      color: #444;
+      line-height: 1.5;
+    }
+
+    .recipe-card ol {
+      counter-reset: step-counter;
+    }
+
+    .recipe-card ol li::before {
+      content: counter(step-counter);
+      counter-increment: step-counter;
+      font-weight: bold;
+      margin-right: 10px;
+      color: #A33737;
+    }
+
+    .btn-search {
+      background-color: #8b4513;
+      border-color: #A33737;
+      color: #fff;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .btn-search:hover {
+      background-color: #330f40;
+      border-color: #330f40;
+    }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      z-index: 9999;
+      max-height: 90%;
+      /* Maximum height of the popup */
+      overflow-y: auto;
+      /* Enable vertical scrolling */
+      max-width: 90%;
+      /* Maximum width of the popup (adjusted from 100% to 90%) */
+    }
+
+    /* Close button styles */
+    .popup-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #555;
+    }
+    #google_translate_element {
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#google_translate_element:hover {
+    background-color: #f1f1f1;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.goog-te-gadget-simple {
+    background-color: #fff !important;
+    border: none !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    text-decoration: none !important;
+}
+
+.goog-te-gadget-simple:hover {
+    background-color: #e6e6e6 !important;
+    color: #333 !important;
+    text-decoration: none !important;
+}
+
+.goog-te-gadget-simple .goog-te-menu-value {
+    color: #333 !important;
+    display: flex;
+    align-items: center;
+    text-decoration: none !important;
+}
+
+.goog-te-gadget-simple .goog-te-menu-value:after {
+    content: 'Select Language';
+    color: #333;
+    margin-left: 8px;
+    font-weight: 500;
+    text-decoration: none !important;
+}
+
+.goog-te-gadget-simple .goog-te-menu-value span:first-child {
+    display: none !important;
+    text-decoration: none !important;
+}
+
+.goog-te-gadget-icon {
+    display: none !important;
+}
+
+/* Additional styles for the dropdown menu */
+.goog-te-menu-frame {
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+    background-color: #fff !important;
+}
+
+.goog-te-menu2 {
+    background-color: #fff !important;
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+    margin-top: 5px !important;
+}
+
+.goog-te-menu2-item div {
+    padding: 5px 10px !important;
+    color: #333 !important;
+    text-decoration: none !important;
+    transition: background-color 0.3s ease;
+}
+
+.goog-te-menu2-item div:hover {
+    background-color: #f1f1f1 !important;
+    color: #000 !important;
+}
+
+/* Removing underline from the links inside dropdown */
+.goog-te-menu2 a {
+    text-decoration: none !important;
+    color: inherit !important;
+}
+
+.goog-te-menu2 a:hover {
+    text-decoration: none !important;
+    color: inherit !important;
+}
+
+body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #ffffff;
+      color: #343a40;
+      margin: 0;
+      padding: 0;
+    }
+
+    .error-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .error-content {
+      text-align: center;
+    }
+
+    .error-title {
+      font-size: 3rem;
+      font-weight: bold;
+      margin: 20px 0;
+      color: #8b4513;
+    }
+
+    .error-message {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    .error-message a {
+      color: #A33737;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .error-message a:hover {
+      text-decoration: underline;
+    }
+
+    .footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #343a40;
+      color: #fff;
+      text-align: center;
+      padding: 10px 0;
+    }
+
+  </style>
+</head>
+<body>
+  <nav class="uk-navbar-container uk-letter-spacing-small">
+    <div class="uk-container">
+      <div data-uk-navbar>
+        <div class="uk-navbar-left">
+          <a class="uk-navbar-item uk-logo" href="{{ url_for('index') }}">Tarife</a>
+          <div class="uk-visible@m uk-margin-large-left">
+            <ul class="uk-navbar-nav">
+              <li class="uk-active"><a href="{{ url_for('index') }}">Home</a></li>
+              <li class="uk-active"><a href="{{ url_for('recommandation_page') }}">Recommandation</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="uk-navbar-right">
+          <div class="uk-margin-right">
+            <div class="uk-inline">
+              <div class="uk-form-select">
+                <span></span>
+                <div class="select_lug" id="google_translate_element"></div>
+              </div>
+            </div>
+          </div>
+          <a class="uk-navbar-toggle uk-hidden@m" href="#offcanvas" data-uk-toggle><span
+              data-uk-navbar-toggle-icon></span></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="error-container">
+    <div class="error-content">
+        <h1 class="error-title">404 - Not Found</h1>
+        <p class="error-message">Sorry, the requested resource could not be found on the server.</p>
+        
+        <p class="error-message">Return to <a href="{{ url_for('index') }}">Home</a></p>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <a href="{{ url_for('index') }}" style="color: #fff;" target="_blank">The Tarife</a>
+  </footer>
+</body>
+
+</html>

@@ -1,0 +1,286 @@
+
+/* Recipes Page Css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800;900&display=swap');
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#header_title{
+/* float: left;
+width: auto; */
+text-align: left;
+width: 100%;
+}
+@import url('https://fonts.googleapis.com/css?family=Oswald|Roboto|Slabo+27px');
+@import 'bourbon';
+body {
+    font-weight: 300;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  .btn {
+    font-family: inherit;
+    cursor: pointer;
+    outline: 0;
+    font-size: 1.05rem;
+  }
+  
+  .text {
+    opacity: 0.8;
+  }
+
+h1 {
+  font-size: 32px;
+  margin-top: 30px;
+  font-family: 'Oswald', sans-serif;
+  text-align: center;
+}
+
+.recipe-wrapper {
+  padding: 15px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.recipe-card {
+  @include transition(.3s);
+  max-width: 300px;
+  margin: 15px;
+  background: #fff;
+  border: 1px solid #4CAF50; /* Green border color for recipes */
+  text-align: center;
+  cursor: pointer;
+}
+
+.recipe-card:hover {
+  box-shadow: 0 3px 10px 0 rgba(0, 128, 0, .1); /* Green box shadow on hover */
+}
+
+.recipe-card:hover .card-img img {
+  opacity: 0.8;
+}
+
+.recipe-card .card-img {
+  position: relative;
+  text-align: center;
+  background: #4CAF50; /* Green background color for recipe image */
+}
+
+.recipe-card .card-img img {
+  @include transition(.3s);
+  max-height: 180px;
+  width: 100%;
+  border-bottom: 4px solid #4CAF50; /* Green border color for image bottom */
+}
+
+.recipe-card .card-img:before {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  margin-left: -10px;
+  width: 0;
+  height: 0;
+  border-top: solid 10px #4CAF50; /* Green triangle below image */
+  border-left: solid 10px transparent;
+  border-right: solid 10px transparent;
+}
+
+.recipe-card .card-img h1 {
+  position: absolute;
+  margin: 0;
+  font-size: 42px;
+  bottom: 15px;
+  width: 100%;
+  color: #fff;
+  font-family: 'Slabo 27px', serif;
+}
+
+.recipe-card .card-details {
+  margin-top: 30px;
+  font-family: 'Roboto', sans-serif;
+  color: #3C3C3C;
+}
+
+.recipe-card .card-details span {
+  padding: 0 30px;
+}
+
+.recipe-card .card-details i {
+  margin-right: 5px;
+}
+
+.recipe-card .card-text {
+  padding: 30px 15px;
+  font-family: 'Roboto', sans-serif;
+  line-height: 22px;
+}
+
+.recipe-card .read-more {
+  @include transition(.3s);
+  display: inline-block;
+  width: auto;
+  text-align: center;
+  text-transform: uppercase;
+  background: #4CAF50; /* Green background color for read more button */
+  color: #fff;
+  padding: 15px;
+  margin-bottom: 30px;
+  font-family: 'Oswald', sans-serif;
+}
+
+.recipe-card .read-more:hover {
+  background: darken(#4CAF50, 20%);
+}
+
+/* Apply styles to the header wrapper */
+#header_wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    padding: 10px 20px; /* Adjust padding as needed */
+  }
+  
+  #header_title {
+    margin: 0;
+  }
+  
+  /* Apply styles to the navigation bar */
+  #header_menu {
+    display: flex;
+    align-items: center;
+  }
+  
+  #header_menu nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+  }
+  
+  #header_menu nav li {
+    margin-right: 30px;
+  }
+  
+  #header_menu nav li:last-child {
+    margin-right: 10px;
+  }
+  
+  #header_menu nav li a {
+    display: block;
+    color: black;
+    text-align: center;
+    text-decoration: none;
+    padding: 10px 10px;
+  }
+  
+  .menu-icon {
+    display: none; /* Hide the menu icon by default */
+    cursor: pointer;
+    font-size: 24px;
+  }
+  
+  nav li a:hover {
+    background-color: #87CEFA;
+    color: black;
+  }
+  
+  @media (max-width: 768px) {
+    #header_menu nav {
+      display: none;
+      flex-direction: column;
+      position: fixed;
+      top: 60px;
+      right: 0;
+      width: 100%;
+      background-color: #fff;
+      box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.1);
+    }
+  
+    #header_menu nav.show {
+      display: flex;
+    }
+  
+    #header_menu nav ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+  
+    #header_menu nav li {
+      margin: 0;
+    }
+  
+    #header_menu nav li a {
+      display: block;
+      color: black;
+      text-align: center;
+      text-decoration: none;
+      padding: 14px 16px;
+    }
+  
+    .menu-icon {
+      display: block;
+      cursor: pointer;
+      font-size: 24px;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+    }
+  }
+  
+  
+/* side bar */
+#sidebar {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  top: 0;
+  right: 0;
+  background-color: white;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  z-index: 1000; /* Set a high z-index value */
+}
+
+#sidebar a {
+  padding: 15px 25px;
+  text-decoration: none;
+  font-size: 18px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+#sidebar a:hover {
+  color: #f1f1f1;
+}
+
+#sidebar .close-btn {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  top: 10px;
+  right: 10px;
+  font-size: 30px;
+  display: flex; /* Use flexbox */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  cursor: pointer;
+  color: black;
+  background-color: whitesmoke;
+}
