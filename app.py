@@ -184,14 +184,8 @@ def generate_image(prompt):
         image_url = response['data'][0]['url']
         return image_url
 
-    except openai.error.InvalidRequestError as e:
-        print(f"Invalid request: {e.user_message}")
-    except openai.error.APIConnectionError:
-        print("Error connecting to the API. Please try again later.")
     except openai.error.RateLimitError:
         print("Rate limit exceeded. Please wait before making more requests.")
-    except openai.error.OpenAIError as e:
-        print(f"An error occurred: {e}")
 
     return None
 
