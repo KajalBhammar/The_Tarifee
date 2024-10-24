@@ -183,6 +183,7 @@ def generate_image(prompt):
         # Access and return the generated image URL
         image_url = response['data'][0]['url']
         return image_url
+    return None
 
 @app.route('/')
 def index():
