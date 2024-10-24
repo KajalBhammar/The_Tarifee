@@ -174,29 +174,18 @@ def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cook
 import openai
 import time
 
-def generate_image(prompt, retries=3):
-    for attempt in range(retries):
-        try:
-            # Make a request to generate an image with DALL·E
-            response = openai.Image.create(
-                prompt=prompt,  # Optimized prompt
-                n=1,            # Number of images to generate
-                size="1024x1024"  # Size of the image
-            )
+def generate_image(recipe_name):
+    try:
+        response = openai.Image.create(
+            prompt=recipe_name,
+            n=1,
+            size="512x512"
+        )
+        return response['data'][0]['url']
+    except OpenAIError as e:
+        print(f"An error occurred: {e}")
+        return None
 
-            # Access and return the generated image URL
-            image_url = response['data'][0]['url']
-            return image_url
-
-        except openai.error.RateLimitError:
-            print("Rate limit exceeded. Please wait before making more requests.")
-            time.sleep(2)  # Wait before retrying
-        except openai.error.OpenAIError as e:
-            print(f"An error occurred: {e}")
-            if attempt < retries - 1:
-                time.sleep(2)  # Wait before retrying
-
-    return None
 
 
 @app.route('/')
