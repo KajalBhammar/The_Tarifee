@@ -201,7 +201,7 @@
         {% if image_url %}
             <img src="{{ image_url }}" alt="Generated image for recipe" width="400px">
         {% else %}
-            <img src="1.jpeg" alt="Veggie Quinoa Salad Image"> <!-- Fallback image -->
+            <img src="1.jpeg" alt="{{ recipe_content['recipe_name'] }}"> <!-- Fallback image -->
         {% endif %}
     </div>
 
