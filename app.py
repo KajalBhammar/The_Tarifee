@@ -9,6 +9,7 @@ import logging
 import re
 from datetime import datetime, timedelta
 import openai
+import openai.error  # Correctly import OpenAIError
 
 app = Flask(__name__)
 openai.api_key = openai_api_key
@@ -171,20 +172,20 @@ def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cook
     return recipe_content
 
 
-import openai
-import time
 
 def generate_image(recipe_name):
     try:
+        # Migrate to a compatible API call or downgrade openai version to below 1.0.0
         response = openai.Image.create(
             prompt=recipe_name,
             n=1,
             size="512x512"
         )
         return response['data'][0]['url']
-    except OpenAIError as e:
+    except openai.error.OpenAIError as e:  # Use the correct error class
         print(f"An error occurred: {e}")
         return None
+
 
 
 
