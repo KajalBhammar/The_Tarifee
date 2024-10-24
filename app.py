@@ -68,9 +68,9 @@ def handle_method_not_allowed(e):
 def handle_too_many_requests(e):
     return render_template('Errors/429.html'), 429
 
-@app.errorhandler(500)
-def handle_internal_server_error(e):
-    return render_template('Errors/500.html'), 500
+# @app.errorhandler(500)
+# def handle_internal_server_error(e):
+#     return render_template('Errors/500.html'), 500
 
 def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cooking_time=None):
     # Initialize the LLM
@@ -171,24 +171,29 @@ def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cook
     return recipe_content
 
 
-import traceback
-
 def generate_image(prompt):
-    logging.info(f"Generating image with prompt: {prompt}")
     try:
+        # Make a request to generate an image with DALL·E
         response = openai.Image.create(
-            prompt=prompt,
-            n=1,
-            size="1024x1024"
+            prompt=prompt,  # Optimized prompt
+            n=1,            # Number of images to generate
+            size="1024x1024"  # Size of the image
         )
+
+        # Access and return the generated image URL
         image_url = response['data'][0]['url']
         return image_url
-    except Exception as e:
-        logging.error(f"Error generating image: {e}")
-        logging.error(traceback.format_exc())  # Log the traceback for more details
+
+    except openai.error.InvalidRequestError as e:
+        print(f"Invalid request: {e.user_message}")
+    except openai.error.APIConnectionError:
+        print("Error connecting to the API. Please try again later.")
+    except openai.error.RateLimitError:
+        print("Rate limit exceeded. Please wait before making more requests.")
+    except openai.error.OpenAIError as e:
+        print(f"An error occurred: {e}")
+
     return None
-
-
 
 @app.route('/')
 def index():
@@ -274,5 +279,5 @@ def recommandation_page():
     return render_template('Recommandation.html', top_5_recipes=top_5_recipes)
 
 if __name__ == '__main__':
-     #app.run(debug=True)
-     app.run(host='0.0.0.0', port=8080)
+    #  app.run(debug=True)
+   app.run(host='0.0.0.0', port=8080)
