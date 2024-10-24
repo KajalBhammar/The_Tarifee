@@ -171,7 +171,10 @@ def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cook
     return recipe_content
 
 
+import traceback
+
 def generate_image(prompt):
+    logging.info(f"Generating image with prompt: {prompt}")
     try:
         response = openai.Image.create(
             prompt=prompt,
@@ -180,16 +183,11 @@ def generate_image(prompt):
         )
         image_url = response['data'][0]['url']
         return image_url
-    except openai.error.InvalidRequestError as e:
-        logging.error(f"Invalid request error: {e.user_message}")
-    except openai.error.APIConnectionError as e:
-        logging.error("API connection error: Please check your network connection.")
-    except openai.error.RateLimitError as e:
-        logging.error("Rate limit exceeded: Please try again later.")
     except Exception as e:
-        logging.error(f"General error generating image: {e}")
-    
+        logging.error(f"Error generating image: {e}")
+        logging.error(traceback.format_exc())  # Log the traceback for more details
     return None
+
 
 
 @app.route('/')
