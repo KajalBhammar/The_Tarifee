@@ -3,4 +3,6 @@ langchain
 openai
 langchain_community
 flask_limiter
+openai==0.28
+
     
