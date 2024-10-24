@@ -68,9 +68,9 @@ def handle_method_not_allowed(e):
 def handle_too_many_requests(e):
     return render_template('Errors/429.html'), 429
 
-# @app.errorhandler(500)
-# def handle_internal_server_error(e):
-#     return render_template('Errors/500.html'), 500
+ @app.errorhandler(500)
+ def handle_internal_server_error(e):
+     return render_template('Errors/500.html'), 500
 
 def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cooking_time=None):
     # Initialize the LLM
@@ -171,23 +171,33 @@ def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cook
     return recipe_content
 
 
-def generate_image(prompt):
-    try:
-        # Make a request to generate an image with DALL·E
-        response = openai.Image.create(
-            prompt=prompt,  # Optimized prompt
-            n=1,            # Number of images to generate
-            size="1024x1024"  # Size of the image
-        )
+import openai
+import time
 
-        # Access and return the generated image URL
-        image_url = response['data'][0]['url']
-        return image_url
+def generate_image(prompt, retries=3):
+    for attempt in range(retries):
+        try:
+            # Make a request to generate an image with DALL·E
+            response = openai.Image.create(
+                prompt=prompt,  # Optimized prompt
+                n=1,            # Number of images to generate
+                size="1024x1024"  # Size of the image
+            )
 
-    except openai.error.RateLimitError:
-        print("Rate limit exceeded. Please wait before making more requests.")
+            # Access and return the generated image URL
+            image_url = response['data'][0]['url']
+            return image_url
+
+        except openai.error.RateLimitError:
+            print("Rate limit exceeded. Please wait before making more requests.")
+            time.sleep(2)  # Wait before retrying
+        except openai.error.OpenAIError as e:
+            print(f"An error occurred: {e}")
+            if attempt < retries - 1:
+                time.sleep(2)  # Wait before retrying
 
     return None
+
 
 @app.route('/')
 def index():
