@@ -173,17 +173,16 @@ def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cook
 
 def generate_image(prompt):
     try:
-        # Make a request to generate an image with DALL·E
         response = openai.Image.create(
-            prompt=prompt,  # Optimized prompt
-            n=1,            # Number of images to generate
-            size="1024x1024"  # Size of the image
+            prompt=prompt,
+            n=1,
+            size="1024x1024"
         )
-
-        # Access and return the generated image URL
         image_url = response['data'][0]['url']
         return image_url
-    return None
+    except Exception as e:
+        logging.error(f"Error generating image: {e}")
+        return None
 
 @app.route('/')
 def index():
