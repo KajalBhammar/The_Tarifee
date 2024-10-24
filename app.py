@@ -82,7 +82,7 @@ def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cook
 
     # Start building the template for the recipe prompt
     template = """
-    Your task is to generate a recipe based on the provided preferences and ingredients. 
+    Your task is to generate a recipe based on the provided recipe name and ingredients. 
     Exclude the ingredient '{}' and use '{}' instead. Keep the cooking time around '{}' minutes (within 5 minutes).
 
 
@@ -93,12 +93,6 @@ def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cook
         Please list all the ingredients needed for the recipe, each on a new line.
 
     3. Recipe steps:
-        each stpes should be in new line
-        for example:
-        1.
-        2.
-        3.
-        4.
         Provide step-by-step instructions on how to prepare the dish. Start each step with a number or bullet point, each on a new line.
 
     4. Cooking Time:
@@ -179,16 +173,16 @@ def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cook
 
 def generate_image(prompt):
     try:
+        # Make a request to generate an image with DALL·E
         response = openai.Image.create(
-            prompt=prompt,
-            n=1,
-            size="1024x1024"
+            prompt=prompt,  # Optimized prompt
+            n=1,            # Number of images to generate
+            size="1024x1024"  # Size of the image
         )
+
+        # Access and return the generated image URL
         image_url = response['data'][0]['url']
         return image_url
-    except Exception as e:
-        logging.error(f"Error generating image: {e}")
-        return None
 
 @app.route('/')
 def index():
@@ -274,5 +268,5 @@ def recommandation_page():
     return render_template('Recommandation.html', top_5_recipes=top_5_recipes)
 
 if __name__ == '__main__':
-    # app.run(debug=True)
-    app.run(host='0.0.0.0', port=8080)
+     #app.run(debug=True)
+     app.run(host='0.0.0.0', port=8080)
