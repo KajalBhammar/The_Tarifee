@@ -13,6 +13,17 @@ import openai.error  # Correctly import OpenAIError
 
 app = Flask(__name__)
 openai.api_key = openai_api_key
+
+
+# Initialize rate limiter with a limit of 1 request per hour per IP address
+# limiter = Limiter(
+#     key_func=get_remote_address,
+#     app=app,
+#     default_limits=["5 per hour"],
+#     headers_enabled=True  # Ensure headers are enabled for custom responses
+# )
+
+
 # Set up logging
 log_file_name = 'user_activity.log'
 logging.basicConfig(
@@ -194,6 +205,7 @@ def generate_image(recipe_name):
 def index():
     return render_template('index.html')
 
+# @limiter.limit("5 per hour")
 @app.route('/generate_recipe', methods=['POST'])
 def generate_recipe():
     recipe_ingredients = request.form['recipe_ingredients']
