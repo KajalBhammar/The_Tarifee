@@ -14,6 +14,16 @@ import openai.error  # Correctly import OpenAIError
 app = Flask(__name__)
 openai.api_key = openai_api_key
 
+
+# Initialize rate limiter with a limit of 1 request per hour per IP address
+# limiter = Limiter(
+#     key_func=get_remote_address,
+#     app=app,
+#     default_limits=["5 per hour"],
+#     headers_enabled=True  # Ensure headers are enabled for custom responses
+# )
+
+
 # Set up logging
 log_file_name = 'user_activity.log'
 logging.basicConfig(
@@ -23,6 +33,7 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
+# Add a StreamHandler to log to the console
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
@@ -74,14 +85,18 @@ def handle_internal_server_error(e):
     return render_template('Errors/500.html'), 500
 
 def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cooking_time=None):
+    # Initialize the LLM
     llm = ChatOpenAI(model="gpt-3.5-turbo", openai_api_key=openai_api_key, temperature=0.8)
 
+    # Get excluded and substitute ingredients from the form (if any)
     excluded_ingredient = request.form.get('excluded_ingredient', '')
     substitute_ingredient = request.form.get('substitute_ingredient', '')
 
+    # Start building the template for the recipe prompt
     template = """
     Your task is to generate a recipe based on the provided recipe name and ingredients. 
     Exclude the ingredient '{}' and use '{}' instead. Keep the cooking time around '{}' minutes (within 5 minutes).
+
 
     1. Recipe Name:
         Provide a clear and concise title for the dish.
@@ -96,86 +111,181 @@ def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cook
         Provide an estimated cooking time for the recipe in minutes.
 
     5. Meal Preferences:
-        Specify the meal preference: breakfast, lunch, dinner, or snack.
+        Specify the meal preference: breakfast, lunch, dinner, or snack (choose only one of these four).
+   
+    **Image Generation Instructions**:
+    - Generate a visually appealing image that represents the final dish, focusing exclusively on the recipe content. 
+    - Ensure the image captures the essence of the dish, avoiding unrelated visuals or subjects.
+    - Create a visually appealing image showcasing a recipe name in an elegant, modern typography style. The recipe name should be the centerpiece, with bold and captivating lettering. Use a minimalistic background featuring subtle textures or gradients that complement the theme of the recipe. Avoid including any extra images, human figures, or cartoon elements. The focus should remain exclusively on the recipe name, making it stand out with clarity and sophistication.
+
+    Feel free to include any additional tips or details to make the recipe even more delicious.
+
+    Topic: {}
     """
 
-    topic = recipe_name or meal_preference or "recipe"
-    prompt_text = template.format(excluded_ingredient, substitute_ingredient, cooking_time or 'any')
+    # Determine the topic for the recipe prompt
+    if meal_preference:
+        topic = f"{meal_preference} recipe"
+    elif recipe_name:
+        topic = recipe_name
+    elif ingredients:
+        topic = "recipe with " + ", ".join(ingredients)
+    else:
+        raise ValueError("Please provide either recipe_name, ingredients, or meal_preference.")
+
+    # Modify the ingredient list by excluding and substituting ingredients if applicable
+    if excluded_ingredient and ingredients and excluded_ingredient in ingredients:
+        ingredients.remove(excluded_ingredient)
+        if substitute_ingredient:
+            ingredients.append(substitute_ingredient)
+
+    # Incorporate cooking time if provided
+    if cooking_time:
+        topic += f" around {cooking_time} minutes"
+    else:
+        cooking_time = 'any'
+
+    # Finalize the prompt text
+    prompt_text = template.format(excluded_ingredient, substitute_ingredient, cooking_time, topic)
+
+    # Create the prompt template
     prompt_template = PromptTemplate(input_variables=["recipe_name"], template=prompt_text)
 
+    # Create the LLM chain for generating the response
     chain = LLMChain(
         llm=llm,
         prompt=prompt_template,
     )
 
+    # Get the response by running the chain
     response = chain({"recipe_name": topic})['text']
+
+    # Split the response into the recipe components
     recipe_components = response.split("\n\n")
 
+    # Extract recipe details
     recipe_name = recipe_components[0].replace("1. Recipe Name:", "").strip()
     ingredients_list = [ingredient.strip() for ingredient in recipe_components[1].replace("2. List of ingredients:", "").strip().split("\n")]
     recipe_steps = "\n".join([step.strip() for step in recipe_components[2].replace("3. Recipe steps:", "").strip().split("\n")])
     cooking_time = recipe_components[3].replace("4. Cooking Time:", "").strip()
     meal_preference = recipe_components[4].replace("5. Meal Preferences:", "").strip()
+    additional_info = recipe_components[5].replace("Additional tip:", "").strip() if len(recipe_components) > 5 else None
 
+    # Construct the recipe dictionary
     recipe_content = {
         "recipe_name": recipe_name,
         "cooking_time": cooking_time,
         "ingredients": ingredients_list,
         "recipe_steps": recipe_steps,
         "meal_preference": meal_preference,
+        "additional_info": additional_info,
     }
 
     return recipe_content
 
-def is_recipe_related(name):
-    keywords = ['cake', 'salad', 'soup', 'curry', 'bread', 'pasta', 'pizza', 'dish', 'meal', 'snack']
-    return any(keyword in name.lower() for keyword in keywords)
+
 
 def generate_image(recipe_name):
-    if not is_recipe_related(recipe_name):
-        logging.warning(f"Invalid recipe name for image generation: {recipe_name}")
-        return None
-
     try:
-        prompt = (
-            f"Generate a high-quality image of a cooked dish titled '{recipe_name}'. "
-            "Focus exclusively on the plated food presentation in a clean and minimalistic style. "
-            "Avoid including any unrelated visuals such as people, text, or background elements. "
-            "The image should capture the essence of the dish with vibrant colors and professional styling."
-        )
-
+        # Migrate to a compatible API call or downgrade openai version to below 1.0.0
         response = openai.Image.create(
-            prompt=prompt,
+            prompt=recipe_name,
             n=1,
             size="512x512"
         )
-
         return response['data'][0]['url']
-    except openai.error.OpenAIError as e:
-        logging.error(f"Image generation error: {e}")
+    except openai.error.OpenAIError as e:  # Use the correct error class
+        print(f"An error occurred: {e}")
         return None
+
+
+
+
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
+# @limiter.limit("5 per hour")
 @app.route('/generate_recipe', methods=['POST'])
 def generate_recipe():
     recipe_ingredients = request.form['recipe_ingredients']
     cooking_time = request.form['cooking_time']
     meal_preference = request.form['meal_preference']
 
+    # Split the recipe ingredients into recipe name and ingredients
     recipe_name, *ingredients_list = recipe_ingredients.split('\n')
+
+    # Join the remaining lines as ingredients list
     ingredients_list = [ingredient.strip() for ingredient in ingredients_list if ingredient.strip()]
 
+    # Log user activity
     user_interaction_logger.info(f"Generating recipe with ingredients: {recipe_ingredients}, cooking time: {cooking_time}, meal preference: {meal_preference}")
 
     recipe_content = search_recipe(recipe_name=recipe_name, ingredients=ingredients_list, meal_preference=meal_preference)
+
+    # Generate image using the recipe name
     image_url = generate_image(recipe_name)
 
+    # Log most searched keywords
     most_searched_keywords_logger.info(recipe_name)
 
     return render_template('view.html', recipe_content=recipe_content, image_url=image_url)
 
+@app.route('/get_substitutions', methods=['POST'])
+def get_substitutions():
+    ingredient = request.json['ingredient']
+    llm = ChatOpenAI(model="gpt-3.5-turbo", openai_api_key=openai_api_key)
+    template = f"Given the ingredient '{ingredient}', Based on the following ingredient list, please suggest five substitutions for {ingredient} and only name"
+    response = llm.invoke(template).content
+    substitutions = response.split("\n")
+    return jsonify(substitutions)
+
+@app.route('/Recommandation')
+def recommandation_page():
+    # Initialize recipe_counts dictionary
+    recipe_counts = {}
+
+    # Open the log file and read its contents
+    with open('most_searched_keywords.log', 'r') as file:
+        file_data = file.readlines()
+
+        # Define patterns for date, time, and recipe
+        date_pattern = r"(\d{4}-\d{2}-\d{2})"
+        time_pattern = r"(\d{2}:\d{2}:\d{2})"
+        recipe_pattern = r" - INFO - (.*)"
+
+        for line in file_data:
+            # Extract date
+            date_match = re.search(date_pattern, line)
+            if date_match:
+                date = date_match.group(1)
+
+                # Parse date to datetime object
+                log_date = datetime.strptime(date, '%Y-%m-%d')
+
+                # Check if log entry is within the last 48 hours
+                if log_date >= (datetime.now() - timedelta(hours=48)):
+
+                    # Extract recipe
+                    recipe_match = re.search(recipe_pattern, line)
+                    if recipe_match:
+                        recipe_name = recipe_match.group(1)
+
+                        # Increment count for the recipe
+                        if recipe_name in recipe_counts:
+                            recipe_counts[recipe_name] += 1
+                        else:
+                            recipe_counts[recipe_name] = 1
+
+    # Sort recipes by frequency
+    most_searched_recipes = sorted(recipe_counts.items(), key=lambda x: x[1], reverse=True)
+
+    # Get the top 5 recipes
+    top_5_recipes = most_searched_recipes[:5]
+
+    return render_template('Recommandation.html', top_5_recipes=top_5_recipes)
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    #  app.run(debug=True)
+   app.run(host='0.0.0.0', port=8080)
