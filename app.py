@@ -4,16 +4,15 @@ from flask_limiter.util import get_remote_address
 from langchain.prompts import PromptTemplate
 from langchain.chat_models import ChatOpenAI
 from langchain.chains.llm import LLMChain
-from openai_api_key import openai_api_key  # Assuming you have an openai_api_key.py file with your API key
+from openai_api_key import openai_api_key 
 import logging
 import re
 from datetime import datetime, timedelta
 import openai
-import openai.error  # Correctly import OpenAIError
+import traceback
 
 app = Flask(__name__)
 openai.api_key = openai_api_key
-
 
 # Initialize rate limiter with a limit of 1 request per hour per IP address
 # limiter = Limiter(
@@ -94,7 +93,7 @@ def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cook
 
     # Start building the template for the recipe prompt
     template = """
-    Your task is to generate a recipe based on the provided recipe name and ingredients. 
+    Your task is to generate a veg only recipe based on the provided recipe name and ingredients. 
     Exclude the ingredient '{}' and use '{}' instead. Keep the cooking time around '{}' minutes (within 5 minutes).
 
 
@@ -116,7 +115,6 @@ def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cook
     **Image Generation Instructions**:
     - Generate a visually appealing image that represents the final dish, focusing exclusively on the recipe content. 
     - Ensure the image captures the essence of the dish, avoiding unrelated visuals or subjects.
-    - Create a visually appealing image showcasing a recipe name in an elegant, modern typography style. The recipe name should be the centerpiece, with bold and captivating lettering. Use a minimalistic background featuring subtle textures or gradients that complement the theme of the recipe. Avoid including any extra images, human figures, or cartoon elements. The focus should remain exclusively on the recipe name, making it stand out with clarity and sophistication.
 
     Feel free to include any additional tips or details to make the recipe even more delicious.
 
@@ -184,19 +182,30 @@ def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cook
     return recipe_content
 
 
-
-def generate_image(recipe_name):
+def generate_image(prompt):
+    logging.info(f"Generating image with prompt: {prompt}")
     try:
-        # Migrate to a compatible API call or downgrade openai version to below 1.0.0
+        # Refine the prompt to focus specifically on recipe-related visuals
+        refined_prompt = f"Generate a high-quality image of a delicious and visually appealing dish named '{prompt}', showcasing the main ingredients and presentation style as described in the recipe. Ensure the image is realistic and directly represents the dish, excluding any unrelated objects or background elements."
+
+        # Log the refined prompt to verify
+        logging.info(f"Refined Image Prompt: {refined_prompt}")
+
+        # Generate image based on the refined prompt
         response = openai.Image.create(
-            prompt=recipe_name,
+            prompt=refined_prompt,
             n=1,
-            size="512x512"
+            size="1024x1024"
         )
-        return response['data'][0]['url']
-    except openai.error.OpenAIError as e:  # Use the correct error class
-        print(f"An error occurred: {e}")
-        return None
+
+        # Retrieve the image URL
+        image_url = response['data'][0]['url']
+        logging.info(f"Image URL: {image_url}")
+        return image_url
+    except Exception as e:
+        logging.error(f"Error generating image: {e}")
+        logging.error(traceback.format_exc())  # Log the traceback for more details
+    return None
 
 
 
@@ -206,7 +215,6 @@ def generate_image(recipe_name):
 def index():
     return render_template('index.html')
 
-# @limiter.limit("5 per hour")
 @app.route('/generate_recipe', methods=['POST'])
 def generate_recipe():
     recipe_ingredients = request.form['recipe_ingredients']
@@ -287,5 +295,5 @@ def recommandation_page():
     return render_template('Recommandation.html', top_5_recipes=top_5_recipes)
 
 if __name__ == '__main__':
-    #  app.run(debug=True)
-   app.run(host='0.0.0.0', port=8080)
+     app.run(debug=True)
+#    app.run(host='0.0.0.0', port=8080)
