@@ -217,11 +217,13 @@
         </ul>
     </div>
 
-    <div class="steps">
+      <div class="steps">
         <h3>How to Make It</h3>
-        <p>{{ recipe_content['recipe_steps'] }}</p>
-
-        
+        <ul>
+            {% for step in recipe_content['recipe_steps'].split('\n') %}
+                <li>{{ step }}</li>
+            {% endfor %}
+        </ul>
     </div>
 
     <div class="recipe-footer">
