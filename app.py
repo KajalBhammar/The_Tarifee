@@ -295,5 +295,5 @@ def recommandation_page():
     return render_template('Recommandation.html', top_5_recipes=top_5_recipes)
 
 if __name__ == '__main__':
-     app.run(debug=True)
-#    app.run(host='0.0.0.0', port=8080)
+#     app.run(debug=True)
+     app.run(host='0.0.0.0', port=8080)
