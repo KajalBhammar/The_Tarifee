@@ -116,6 +116,7 @@ def search_recipe(recipe_name=None, ingredients=None, meal_preference=None, cook
     **Image Generation Instructions**:
     - Generate a visually appealing image that represents the final dish, focusing exclusively on the recipe content. 
     - Ensure the image captures the essence of the dish, avoiding unrelated visuals or subjects.
+    - Create a visually appealing image showcasing a recipe name in an elegant, modern typography style. The recipe name should be the centerpiece, with bold and captivating lettering. Use a minimalistic background featuring subtle textures or gradients that complement the theme of the recipe. Avoid including any extra images, human figures, or cartoon elements. The focus should remain exclusively on the recipe name, making it stand out with clarity and sophistication.
 
     Feel free to include any additional tips or details to make the recipe even more delicious.
 
